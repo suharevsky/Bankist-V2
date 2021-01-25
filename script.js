@@ -10,6 +10,8 @@ const nav = document.querySelector('.nav');
 const tabs = document.querySelector('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
+const allSections = document.querySelectorAll('.section');
+const header = document.querySelector('.header');
 
 // Modal Popup
 const openModal = function () {
@@ -97,33 +99,9 @@ nav.addEventListener('mouseover', handleHover.bind(0.5));
 nav.addEventListener('mouseout', handleHover.bind(1));
 
 // Sticky navigation
-const initialCoords = section1.getBoundingClientRect();
-
-// window.addEventListener('scroll', function () {
-//   if (window.scrollY > initialCoords.top) {
-//     nav.classList.add('sticky');
-//   } else {
-//     nav.classList.remove('sticky');
-//   }
-// });
-
-// const obsCallback = function (entries, observer) {
-//   entries.forEach(entry => {
-//     console.log(entry);
-//   });
-// };
-// const observerOptions = {
-//   root: null,
-//   threshhold: [0, 0.2, 0.7],
-// };
-// const observer = new IntersectionObserver(obsCallback, observerOptions);
-// observer.observe(section1);
-
-const header = document.querySelector('.header');
 const navHeight = nav.getBoundingClientRect().height;
 const stickyNav = function (entries) {
   const [entry] = entries;
-  console.log(entry.isIntersecting);
   if (!entry.isIntersecting) {
     nav.classList.add('sticky');
   } else {
@@ -136,4 +114,24 @@ const headerObserver = new IntersectionObserver(stickyNav, {
   threshold: 0,
   rootMargin: `-${navHeight}px`,
 });
+
 headerObserver.observe(header);
+
+// Reveal sections
+const revealSection = function (entries, observer) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
+
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+
+allSections.forEach(function (section) {
+  section.classList.add('section--hidden');
+  sectionObserver.observe(section);
+});
